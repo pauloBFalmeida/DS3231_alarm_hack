@@ -1,3 +1,34 @@
+# Forked DS3231 RTC Library with Alarm Register Storage Hack
+This forked version of the [DS3231 RTC library](https://github.com/NorthernWidget/DS3231) introduces new functions that allow the use of the alarm registers as additional storage space. Alarm1 can hold up to 4 bytes, and Alarm2 can hold up to 3 bytes. This hack provide a way to store small data directly in the RTC module, utilizing otherwise unused alarm registers to store data while the main board is without power.
+
+## New Functions
+Use setAxData to store data (where x is 1 or 2, for Alarm1 or Alarm2).
+```
+byte byteA, byteB, byteC, byteD, AlarmBits;
+bool A1Dy;
+setA1Data(byteA, byteB, byteC, byteD, AlarmBits, A1Dy);
+```
+
+Use getAxData to get data back (where x is 1 or 2)
+```
+byte byteA, byteB, byteC, byteD, AlarmBits;
+bool A1Dy;
+getA1Data(byteA, byteB, byteC, byteD, AlarmBits, A1Dy);
+```
+
+| Variable | Range | Present in Alarms | Originally |
+|----------|-------|-------|------------------------|
+| byteA | 0 to 127 | 1       | Seconds |
+| byteB | 0 to 127 | 1 and 2 | Minutes |
+| byteC | 0 to 127 | 1 and 2 | Hours   |
+| byteD | 0 to 63  | 1 and 2 | Day     |
+
+AlarmBits and AxDy are the same as in the original library, referring to the alarm rate. However, since we are not using valid time data in the registers, they only serve to prevent the alarm from triggering every second.
+
+## Ino examples
+TODO: create ino examples and add them were
+
+
 # DS3231 Library
 An Arduino library for the DS3231 real-time clock (RTC).  
 
