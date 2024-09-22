@@ -193,12 +193,40 @@ class DS3231 {
 			// giving you the correct time.
 			// The OSF is cleared by function setSecond();.
 
+  // ---- Altered to use the alarms as data storage ----
+    void getA1Data(byte& byteA, byte& byteB, byte& byteC, byte& byteD, byte& AlarmBits, bool& A1Dy);
+      // Get data stored in A1
+    void getA1DataFull(byte& byteA, byte& byteB, byte& byteC, byte& byteD);
+      // Get data stored in A1, ignoring the flags
+    void getA2Data(byte& byteB, byte& byteC, byte& byteD, byte& AlarmBits, bool& A2Dy);
+      // Get data stored in A2
+    void getA2DataFull(byte& byteB, byte& byteC, byte& byteD);
+      // Get data stored in A2, ignoringthe flags
+    void setA1Data(byte byteA, byte byteB, byte byteC, byte byteD, byte AlarmBits, bool A1Dy);
+      // Put data in A1
+    void setA1DataFull(byte byteA, byte byteB, byte byteC, byte byteD);
+      // Put data in A1, ignoring the alarm flags
+    void setA2Data(byte byteB, byte byteC, byte byteD, byte AlarmBits, bool A2Dy);
+      // Put data in A2
+    void setA2DataFull(byte byteB, byte byteC, byte byteD);
+      // Put data in A2, ignoring the alarm flags
+
+    void setValidAlarm(byte Alarm, const bool valid);
+      // Set whether the requested alarm is holding
+			// valid time data. Defaults to 2 if Alarm != 1.
+    bool checkValidAlarm(byte Alarm);
+      // Returns T/F to indicate whether the requested alarm has
+			// valid time data. Defaults to 2 if Alarm != 1.
+
 	private:
 
 		byte decToBcd(byte val);
 			// Convert normal decimal numbers to binary coded decimal
 		byte bcdToDec(byte val);
 			// Convert binary coded decimal to normal decimal numbers
+
+    byte validAlarm = 0b11;
+      // Alarm 1 (0b01) and Alarm 2 (0b10) contain valid time data in them
 
 	protected:
 

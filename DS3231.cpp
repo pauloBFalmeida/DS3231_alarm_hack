@@ -766,6 +766,184 @@ bool DS3231::oscillatorCheck() {
 }
 
 /*****************************************
+Altered Functions
+*****************************************/
+
+void DS3231::getA1Data(byte& byteA, byte& byteB, byte& byteC, byte& byteD, byte& AlarmBits, bool& A1Dy) {
+  // Get data stored in A1
+  byte temp_buffer;
+	_Wire.beginTransmission(CLOCK_ADDRESS);
+	_Wire.write(0x07);
+	_Wire.endTransmission();
+
+	_Wire.requestFrom(CLOCK_ADDRESS, 4);
+
+	temp_buffer	= _Wire.read();	// Get A1M1 and byteA
+	byteA	= temp_buffer & 0b01111111;
+	// put A1M1 bit in position 0 of DS3231_AlarmBits.
+	AlarmBits	= AlarmBits | (temp_buffer & 0b10000000)>>7;
+
+  temp_buffer		= _Wire.read();	// Get A1M2 and byteB
+	byteB	= temp_buffer & 0b01111111;
+	// put A1M2 bit in position 1 of DS3231_AlarmBits.
+	AlarmBits	= AlarmBits | (temp_buffer & 0b10000000)>>6;
+
+	temp_buffer	= _Wire.read();	// Get A1M3 and byteC
+	byteC	= temp_buffer & 0b01111111;
+	// put A1M3 bit in position 2 of DS3231_AlarmBits.
+	AlarmBits	= AlarmBits | (temp_buffer & 0b10000000)>>5;
+
+	temp_buffer	= _Wire.read();	// Get A1M4 and byteD
+	// put A1M3 bit in position 3 of DS3231_AlarmBits.
+	AlarmBits	= AlarmBits | (temp_buffer & 0b10000000)>>4;
+	// determine A1 day or date flag
+	A1Dy		= (temp_buffer & 0b01000000)>>6;
+	// alarm is by date, not day of week.
+	byteD	= temp_buffer & 0b00111111;
+}
+
+void DS3231::getA1DataFull(byte& byteA, byte& byteB, byte& byteC, byte& byteD) {
+  // Get data stored in A1
+	_Wire.beginTransmission(CLOCK_ADDRESS);
+	_Wire.write(0x07);
+	_Wire.endTransmission();
+
+	_Wire.requestFrom(CLOCK_ADDRESS, 4);
+  byteA	= _Wire.read();
+  byteB	= _Wire.read();
+	byteC	= _Wire.read();
+  byteD	= _Wire.read();
+}
+
+void DS3231::getA2Data(byte& byteB, byte& byteC, byte& byteD, byte& AlarmBits, bool& A2Dy) {
+  // Get data stored in A2
+  byte temp_buffer;
+	_Wire.beginTransmission(CLOCK_ADDRESS);
+	_Wire.write(0x0b);
+	_Wire.endTransmission();
+
+	_Wire.requestFrom(CLOCK_ADDRESS, 3);
+
+  temp_buffer		= _Wire.read();	// Get A1M2 and byteB
+  byteB	= temp_buffer & 0b01111111;
+  // put A1M2 bit in position 1 of DS3231_AlarmBits.
+  AlarmBits	= AlarmBits | (temp_buffer & 0b10000000)>>3;
+
+  temp_buffer	= _Wire.read();	// Get A1M3 and byteC
+  byteC	= temp_buffer & 0b01111111;
+  // put A1M3 bit in position 2 of DS3231_AlarmBits.
+  AlarmBits	= AlarmBits | (temp_buffer & 0b10000000)>>2;
+
+  temp_buffer	= _Wire.read();	// Get A1M4 and byteD
+  // put A1M3 bit in position 3 of DS3231_AlarmBits.
+  AlarmBits	= AlarmBits | (temp_buffer & 0b10000000)>>1;
+  // determine A1 day or date flag
+  A2Dy		= (temp_buffer & 0b01000000)>>6;
+  // alarm is by date, not day of week.
+  byteD	= temp_buffer & 0b00111111;
+}
+
+void DS3231::getA2DataFull(byte& byteB, byte& byteC, byte& byteD) {
+  // Get data stored in A2
+	_Wire.beginTransmission(CLOCK_ADDRESS);
+	_Wire.write(0x0b);
+	_Wire.endTransmission();
+
+	_Wire.requestFrom(CLOCK_ADDRESS, 3);
+  byteB	= _Wire.read();
+  byteC	= _Wire.read();
+  byteD	= _Wire.read();
+}
+
+void DS3231::setA1Data(byte byteA, byte byteB, byte byteC, byte byteD, byte AlarmBits, bool A1Dy) {
+    //	Stores data in  alarm-1 on the DS3231
+    byte temp_buffer;
+    _Wire.beginTransmission(CLOCK_ADDRESS);
+    _Wire.write(0x07);	// A1 starts at 07h
+    // Send A1 byteA and A1M1
+    _Wire.write((byteA & 0x7F) | ((AlarmBits & 0b00000001) << 7));
+    // Send A1 byteB and A1M2
+    _Wire.write((byteB & 0x7F) | ((AlarmBits & 0b00000010) << 6));
+    // Send A1 byteC and A1M3
+    _Wire.write((byteC & 0x7F) | ((AlarmBits & 0b00000100) << 5));
+    // byteD only has the 6 LSB
+    // Figure out A1 day/date and A1M4
+    temp_buffer = (byteD & 0x3F) | ((AlarmBits & 0b00001000)<<4);
+    if (A1Dy) {
+      // Set A1 Day/Date flag (Otherwise it's zero)
+      temp_buffer = temp_buffer | 0b01000000;
+    }
+    _Wire.write(temp_buffer);
+    // All done!
+    _Wire.endTransmission();
+}
+
+void DS3231::setA1DataFull(byte byteA, byte byteB, byte byteC, byte byteD) {
+  //	Stores data in  alarm-1 on the DS3231 ignoring alarm flags
+  _Wire.beginTransmission(CLOCK_ADDRESS);
+  _Wire.write(0x07);	// A1 starts at 07h
+  // Write data
+  _Wire.write(byteA);
+  _Wire.write(byteB);
+  _Wire.write(byteC);
+  _Wire.write(byteD);
+  // All done!
+  _Wire.endTransmission();
+}
+
+void DS3231::setA2Data(byte byteB, byte byteC, byte byteD, byte AlarmBits, bool A1Dy) {
+  //	Sets the alarm-2 date and time on the DS3231, using A2* information
+  byte temp_buffer;
+  _Wire.beginTransmission(CLOCK_ADDRESS);
+  _Wire.write(0x0b);	// A2 starts at 0bh
+  // Send A1 byteB and A2M2
+  _Wire.write((byteB & 0x7F) | ((AlarmBits & 0b00010000) << 3));
+  // Send A1 byteC and A2M3
+  _Wire.write((byteC & 0x7F) | ((AlarmBits & 0b00100000) << 2));
+  // byteD only has the 6 LSB
+  temp_buffer = (byteD & 0x3F) | ((AlarmBits & 0b01000000)<<1);
+  if (A1Dy) {
+    // Set A2 Day/Date flag (Otherwise it's zero)
+    temp_buffer = temp_buffer | 0b01000000;
+  }
+  _Wire.write(temp_buffer);
+  // All done!
+  _Wire.endTransmission();
+}
+
+void DS3231::setA2DataFull(byte byteB, byte byteC, byte byteD) {
+  //	Sets the alarm-2 date and time on the DS3231, using A2* information
+  byte temp_buffer;
+  _Wire.beginTransmission(CLOCK_ADDRESS);
+  _Wire.write(0x0b);	// A2 starts at 0bh
+  // Send A1 byteB and A2M2
+  _Wire.write(byteB);
+  _Wire.write(byteC);
+  _Wire.write(byteD);
+  // All done!
+  _Wire.endTransmission();
+}
+
+
+void DS3231::setValidAlarm(byte Alarm, const bool valid) {
+  //	Sets the requested alarm as holding valid time data. Defaults to 2 if Alarm != 1.
+  if (Alarm == 1) {
+    validAlarm = (validAlarm & ~0b01) | (valid);
+  } else{
+    validAlarm = (validAlarm & ~0b10) | (valid<<1);
+  }
+}
+
+
+bool DS3231::checkValidAlarm(byte Alarm) {
+  //	indicate whether the requested alarm has valid time data. Defaults to 2 if Alarm != 1.
+  if (Alarm == 1) {
+    return (validAlarm & 0b01);
+  }
+  return (validAlarm & 0b10);
+}
+
+/*****************************************
 	Private Functions
  *****************************************/
 
