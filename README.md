@@ -26,8 +26,9 @@ getA1Data(byteA, byteB, byteC, byteD, AlarmBits, A1Dy);
 AlarmBits and AxDy are the same as in the original library, referring to the alarm rate. However, since we are not using valid time data in the registers, they only serve to prevent the alarm from triggering every second.
 
 ## Ino examples
-TODO: create ino examples and add them were
+[DS3231_set_date.ino](examples/DS3231_set_date/DS3231_set_date.ino) is a simple sketch to ajust the time in the RTC, with a comment containing an example input for a specific date.
 
+[DS3231_alarm_hack.ino](examples/DS3231_alarm_hack/DS3231_alarm_hack.ino) is a sketch that demonstrates how to store data in the RTC alarm register.
 
 # DS3231 Library
 An Arduino library for the DS3231 real-time clock (RTC).  
