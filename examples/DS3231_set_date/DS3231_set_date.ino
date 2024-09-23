@@ -17,6 +17,16 @@ byte hour;
 byte minute;
 byte second;
 
+const String namesDoW[] = {
+  "Sunday",   // DoW = 1
+  "Monday",
+  "Tuesday", 
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday"  // DoW = 7
+};
+
 /*
 Day of the week
 1 = Sunday
@@ -87,6 +97,8 @@ void getDateStuff(byte& year, byte& month, byte& date, byte& dOW,
 void print_now() {
     DateTime now = timeRTC.now();
 
+    String strDoW = namesDoW[myRTC.getDoW()-1];
+
     Serial.print(now.year(), DEC);
     Serial.print('/');
     Serial.print(now.month(), DEC);
@@ -98,6 +110,8 @@ void print_now() {
     Serial.print(now.minute(), DEC);
     Serial.print(':');
     Serial.print(now.second(), DEC);
+    Serial.print(' ');
+    Serial.print(strDoW);
     Serial.println();
 }
 
