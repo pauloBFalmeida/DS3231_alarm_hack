@@ -20,7 +20,7 @@ byte second;
 const String namesDoW[] = {
   "Sunday",   // DoW = 1
   "Monday",
-  "Tuesday", 
+  "Tuesday",
   "Wednesday",
   "Thursday",
   "Friday",

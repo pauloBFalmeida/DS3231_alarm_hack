@@ -15,10 +15,10 @@ RTClib timeRTC;
 uint8_t a,b,c,d, flags;
 bool dy;
 
-// Print RTC now time 
+// Print RTC now time
 void print_now() {
     DateTime now = timeRTC.now();
-    
+
     Serial.print(now.year(), DEC);
     Serial.print('/');
     Serial.print(now.month(), DEC);
@@ -36,8 +36,8 @@ void print_now() {
 void set_alarm() {
     Serial.println("Set Alarm1");
 
-    /* 
-        Set a real alarm to day 1 (Monday) 2h 3min 4s 
+    /*
+        Set a real alarm to day 1 (Sunday) 2h 3min 4s
         To trigger when day of week, hours, minutes, and seconds match
 
         A1M1 A1M2 A1M3 A1M4 (AlarmBits)
@@ -65,7 +65,7 @@ void set_alarm() {
     d = random(0,255);
     String output = "a: " + String(a) + ", b: " + String(b) + ", c: " + String(c) + ", d: " + String(d);
     Serial.println(output);
-    
+
     myRTC.setA1DataFull(a,b,c,d);
 }
 
@@ -87,9 +87,9 @@ void setup() {
 void loop() {
     if (Serial.available()) {
         char incomingByte = Serial.read();  // Just remove the data to make it unavailable again
-        /* Set alarm 
+        /* Set alarm
           Input something for setting up the data in the alarm.
-          Power off or reboot the board to confirm that the data persists 
+          Power off or reboot the board to confirm that the data persists
         */
         set_alarm();
     }
@@ -126,7 +126,7 @@ void loop() {
     if (alarm_happened) {
       Serial.println("Alarm 1 has been triggered");
     }
-    
+
     Serial.println();
     // wait 5s
     delay(5000);
